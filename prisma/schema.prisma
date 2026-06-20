@@ -1,0 +1,193 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  githubUrl     String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  resumes           Resume[]
+  analyses          AnalysisHistory[]
+  interviewSessions InterviewSession[]
+  resumeVersions    ResumeVersion[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Resume {
+  id            String            @id @default(uuid())
+  filename      String
+  mimeType      String
+  sizeBytes     Int
+  parsedText    String
+  user          User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String?
+  analyses      AnalysisHistory[]
+  versions      ResumeVersion[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model AnalysisHistory {
+  id                  String             @id @default(uuid())
+  resume              Resume             @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId            String
+  user                User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String?
+  targetRole          String
+  matchPercentage     Int
+  resumeScore         Int                @default(0)
+  atsScore            Int                @default(0)
+  roleMatchPercentage Int                @default(0)
+  industryReadiness   String             @default("Medium")
+  summary             String
+  technicalSkills     Json               // Array of TechnicalSkill
+  softSkills          Json               // Array of string
+  missingSkills       Json               // Array of MissingSkill
+  recommendedSkills   Json               // Array of TechnicalSkill
+  strengths           Json               // Array of string
+  weaknesses          Json               // Array of string
+  improvements        Json               // Array of string
+  recommendedRoles    Json               // Array of string
+  careerSuggestions   Json               // Array of string
+  
+  atsAnalysis         ATSReport          @relation(fields: [atsAnalysisId], references: [id], onDelete: Cascade)
+  atsAnalysisId       String             @unique
+  
+  roadmap             Roadmap            @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapId           String             @unique
+  
+  careerPath          CareerPath         @relation(fields: [careerPathId], references: [id], onDelete: Cascade)
+  careerPathId        String             @unique
+  
+  explainableAI       ExplainableAI      @relation(fields: [explainableAIId], references: [id], onDelete: Cascade)
+  explainableAIId     String             @unique
+  
+  interviewQuestions  Json               // Array of InterviewQuestion
+  projects            Json               // Array of ProjectRecommendation
+  
+  interviewSessions   InterviewSession[]
+  createdAt           DateTime           @default(now())
+}
+
+model ATSReport {
+  id                  String           @id @default(uuid())
+  structureScore      Int
+  formattingScore     Int
+  keywordDensityScore Int
+  contactInfoPresent  Boolean
+  risks               Json             // Array of string
+  recommendations     Json             // Array of string
+  analysis            AnalysisHistory?
+}
+
+model Roadmap {
+  id         String           @id @default(uuid())
+  plan30Days Json             // RoadmapPlan
+  plan60Days Json             // RoadmapPlan
+  plan90Days Json             // RoadmapPlan
+  analysis   AnalysisHistory?
+}
+
+model CareerPath {
+  id           String           @id @default(uuid())
+  currentLevel String
+  nextRole     Json             // CareerPathRole
+  midLevelRole Json             // CareerPathRole
+  seniorRole   Json             // CareerPathRole
+  analysis     AnalysisHistory?
+}
+
+model ExplainableAI {
+  id                     String           @id @default(uuid())
+  extractionLogic        String
+  roadmapReasoning       String
+  atsLogic               String
+  skillGapJustification String
+  analysis               AnalysisHistory?
+}
+
+model InterviewSession {
+  id                String          @id @default(uuid())
+  analysis          AnalysisHistory @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  analysisId        String
+  user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String?
+  targetRole        String
+  questions         Json            // Array of InterviewQuestion
+  userAnswers       Json            // Record<number, string>
+  feedback          Json            // Record<number, QuestionFeedback>
+  overallScore      Int?
+  createdAt         DateTime        @default(now())
+}
+
+model ResumeVersion {
+  id            String   @id @default(uuid())
+  resume        Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId      String
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String?
+  versionNumber Int
+  label         String
+  contentText   String
+  originalScore Int
+  improvedScore Int
+  skillCoverageScore Int
+  improvements  Json     // Array of string
+  createdAt     DateTime @default(now())
+}
+
+model VerifiedResource {
+  id          String   @id @default(uuid())
+  url         String   @unique
+  verified    Boolean
+  title       String?
+  lastChecked DateTime @default(now())
+}
+
