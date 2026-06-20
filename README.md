@@ -2,7 +2,7 @@
 
 ### *AI-Powered Resume Analyzer & Career Intelligence Platform*
 
-[![GitHub Stars](https://img.shields.io/github/stars/nithesh-s/careerpilot-ai?style=for-the-badge&color=818cf8)](https://github.com/nithesh-s/careerpilot-ai)
+[![GitHub Stars](https://img.shields.io/github/stars/nithesh-s/careerpilot-ai?style=for-the-badge&color=818cf8)](https://github.com/red-coder-27/careerpilot-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f43f5e?style=for-the-badge)](LICENSE)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-06b6d4?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-ec4899?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
@@ -30,52 +30,6 @@ CareerPilot AI is a production-grade, startup-backed SaaS platform designed to b
 | **Syllabus** | Action Center Plans | Students | Sequences custom 14-day study tasks for any selected skill. |
 
 ---
-
-## 🏗️ Architecture & Data Flow
-
-```mermaid
-graph TD
-    User([User / Candidate]) -->|Uploads PDF / Selects Role| NextClient[Next.js Client Components]
-    
-    subgraph Frontend [Presentation Layer]
-        NextClient -->|Landing setup| LandingView[LandingView Component]
-        NextClient -->|Dashboard navigation| DashboardView[DashboardView Component]
-    end
-    
-    subgraph Server [Application API Layer]
-        LandingView -->|POST File & Role| API_Analyze[/api/analyze]
-        DashboardView -->|POST Gap Name| API_Action[/api/action]
-        DashboardView -->|POST Transcript| API_Interview[/api/interview/evaluate]
-        DashboardView -->|POST Bullet Point| API_Rewrite[/api/rewrite]
-        DashboardView -->|POST Profile URL| API_Github[/api/github]
-    end
-
-    subgraph ServiceLayer [Processing & Extraction]
-        API_Analyze -->|Extract raw buffer| PDFParser[parser.ts: pdf-parse]
-        API_Analyze -->|Match default links| RecEngine[recommendationEngine.ts]
-    end
-
-    subgraph AIOrchestration [AI Analysis Layer]
-        Gemini[Google Gemini 2.5 Flash API]
-        ZodValidator[Zod Output Schema Validation]
-    end
-
-    API_Analyze & API_Action & API_Interview & API_Rewrite & API_Github -->|Construct JSON Prompt| Gemini
-    Gemini -->|Format Validation| ZodValidator
-
-    subgraph Storage [Persistent Storage Fallback]
-        DBClient[db.ts: Database Helper Client]
-        DBConfig{Is DATABASE_URL set?}
-        PostgreSQL[(PostgreSQL Database)]
-        LocalJSON[(Local db.json file storage)]
-        
-        DBClient --> DBConfig
-        DBConfig -->|Yes| PostgreSQL
-        DBConfig -->|No / Conn Failure| LocalJSON
-    end
-
-    ZodValidator -->|Persist analytics| DBClient
-```
 
 ---
 
