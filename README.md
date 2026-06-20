@@ -1,8 +1,7 @@
 # 🚀 CareerPilot AI
 
 ### *AI-Powered Resume Analyzer & Career Intelligence Platform*
-
-[![GitHub Stars](https://img.shields.io/github/stars/nithesh-s/careerpilot-ai?style=for-the-badge&color=818cf8)](https://github.com/red-coder-27/CareerPilot-AI)
+[![GitHub Stars](https://img.shields.io/github/stars/red-coder-27/CareerPilot-AI?style=for-the-badge&color=818cf8)](https://github.com/red-coder-27/CareerPilot-AI)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f43f5e?style=for-the-badge)](LICENSE)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-06b6d4?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-ec4899?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
